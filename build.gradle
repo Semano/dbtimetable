@@ -1,0 +1,80 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.3.0'
+    }
+}
+
+allprojects {
+
+    repositories {
+        jcenter()
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+
+//The following section configures all your project�s Android-specific parameters, and tells Gradle which version of Android it should build your project with. If you�ve developed Android applications before, the following should all be familiar.//
+
+    compileSdkVersion 23
+
+//The API your project is targeting.//
+
+    buildToolsVersion "23.0.0"
+
+////The version of the build tools you want to use.//
+
+    defaultConfig {
+
+        applicationId "jv.treyas.dbtimetable"
+
+//Defines your application�s ID. Note, earlier versions of the Android plugin used �packageName� instead of �applicationID.�//
+
+        minSdkVersion 10
+
+//The minimum API required by your project.//
+
+        targetSdkVersion 21
+
+//The version of Android you�re developing your application for.//
+
+        versionCode 2
+
+        versionName "2.0"
+    }
+
+    buildTypes {
+        release {
+//�BuildTypes� controls how your app is built and packaged. If you want to create your own build variants, you�ll need to add them to this section.//
+            minifyEnabled true
+//Gradle runs ProGuard during the build process.//
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//Applies the default ProGuard settings from the Android SDK.//
+            debuggable false
+            jniDebuggable false
+        }
+        debug {
+            debuggable true
+            jniDebuggable true
+            renderscriptDebuggable true
+            minifyEnabled true
+            versionNameSuffix '_d'
+        }
+    }
+    dexOptions {
+        incremental true
+    }
+}
+
+dependencies {
+    //Declares the dependencies for the current module.//
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //Although you can add JAR files by compiling them individually, this can be time-consuming if you have lots of JARs. In this example, we�re telling Gradle to add all the JAR files in the app/libs folder.//
+    //compile 'com.android.support:appcompat-v7:21.0.3'
+    //To create more dependencies, add them to the depencies closure.//
+}

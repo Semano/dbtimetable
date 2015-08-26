@@ -17,8 +17,6 @@
 
 package jv.treyas.dbtimetable;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,16 +28,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 public class DBTimetable extends Activity implements View.OnClickListener {
 
-	private DataBaseHelper mDb;
+    private DataBaseHelper mDb;
 
-	private static final String TAG = "MAIN MENU";
-	private Button ferry, bus;
-	private TextView ferryText, busText;
-	public static final int ACTIVITY_NEXT = 1;
+    private static final String TAG = "MAIN MENU";
+    private Button ferry, bus;
+    private TextView ferryText, busText;
+    public static final int ACTIVITY_NEXT = 1;
 
-	@Override
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mainmenu);
@@ -57,43 +57,40 @@ public class DBTimetable extends Activity implements View.OnClickListener {
         busText.setOnClickListener(this);
 
         try {
-        	mDb.createDataBase();
-        }
-        catch (IOException ioe) {
-        	Log.e(TAG, "Unable to create database:" + ioe);
+            mDb.createDataBase();
+        } catch (IOException ioe) {
+            Log.e(TAG, "Unable to create database:" + ioe);
         }
         mDb.close();
-	}
-
-	public void onClick(View v) {
-		if(v == ferry || v == ferryText) {
-			Intent i = new Intent(this, RouteList.class);
-			i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.FERRYROUTE);
-			startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
-		}
-
-		else if(v == bus || v == busText){
-			Intent i = new Intent(this, RouteList.class);
-			i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.BUSROUTE);
-			startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
-		}
-	}
-
-	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.list_mainmenu, menu);
-	    return true;
     }
 
-	@Override
+    public void onClick(View v) {
+        if (v == ferry || v == ferryText) {
+            Intent i = new Intent(this, RouteList.class);
+            i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.FERRYROUTE);
+            startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
+        } else if (v == bus || v == busText) {
+            Intent i = new Intent(this, RouteList.class);
+            i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.BUSROUTE);
+            startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.list_mainmenu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.about_menu:
-        	Intent i = new Intent(this, AboutPage.class);
-        	startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
-        	return true;
+            case R.id.about_menu:
+                Intent i = new Intent(this, AboutPage.class);
+                startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
+                return true;
         }
         return super.onOptionsItemSelected(item);
-	}
+    }
 }

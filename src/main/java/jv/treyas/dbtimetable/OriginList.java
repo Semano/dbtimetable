@@ -30,6 +30,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+
 public class OriginList extends ListActivity {
 
 	private TextView mTitleText;
