@@ -20,54 +20,54 @@ package jv.treyas.dbtimetable;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 public class AboutPage extends Activity implements View.OnClickListener {
 
-	Button emailButton;
+    Button emailButton;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.about_layout);
-		emailButton = (Button) findViewById(R.id.EmailButton);
-		emailButton.setOnClickListener(this);
-	}
-
-	public void onClick(View v) {
-		String
-			emailSubject = "Suggestion for DB Timetable Application on Android";
-
-		final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-
-		emailIntent.setType("plain/text");
-		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new
-				String[] {"justinkv@gmail.com"});
-		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, emailSubject);
-
-		startActivity(Intent.createChooser(emailIntent, "Send mail:"));
-
-	}
-
-	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.list_aboutmenu, menu);
-	    return true;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.about_layout);
+        emailButton = (Button) findViewById(R.id.EmailButton);
+        emailButton.setOnClickListener(this);
     }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.main_menu:
-			setResult(RESULT_FIRST_USER);
-			finish();
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+    public void onClick(View v) {
+        String
+                emailSubject = "Suggestion for DB Timetable Application on Android";
+
+        final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+
+        emailIntent.setType("plain/text");
+        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new
+                String[]{"justinkv@gmail.com"});
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, emailSubject);
+
+        startActivity(Intent.createChooser(emailIntent, "Send mail:"));
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.list_aboutmenu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.main_menu:
+                setResult(RESULT_FIRST_USER);
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -17,10 +17,6 @@
 
 package jv.treyas.dbtimetable;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -39,35 +35,35 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class TimeList extends Activity implements View.OnClickListener {
 
+	private static final String TAG = "TIMELIST";
+	final String[] matrix = {"_id", "time", "departsIn"};
+	final String[] columns = {"time", "departsIn"};
+	final int[] layouts = {R.id.timesLeft, R.id.timesRight};
+	private final Handler mHandler = new Handler();
 	private TextView mTitleText, zeroTimes;
 	private Button tmrButton;
 	private Long mRouteId;
 	private Long mOriginId;
 	private Long nextDeparture = (long) 100;  // For determining text color -- set high to protect when there's no new times
-	private static final String TAG = "TIMELIST";
-	private final Handler mHandler = new Handler();
-
 	private DataBaseHelper mDb;
 	private Calendar currentTime;
 	private ListView listView;
 	private SimpleCursorAdapter timeTableList;
-	private boolean nextDay;
-
-
-	final String[] matrix  = { "_id", "time", "departsIn" };
-    final String[] columns = { "time", "departsIn" };
-    final int[]    layouts = { R.id.timesLeft, R.id.timesRight };
-
-	private MatrixCursor mCursor;
-
 	final Runnable mUpdateResults = new Runnable() {
-        public void run() {
-            updateAdapter();
+		public void run() {
+			updateAdapter();
 
         }
     };
+	private boolean nextDay;
+	private MatrixCursor mCursor;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,15 +84,15 @@ public class TimeList extends Activity implements View.OnClickListener {
 		zeroTimes = (TextView) findViewById(R.id.InactiveRouteText);
 
 		mRouteId = (savedInstanceState == null) ? null :
-        	(Long) savedInstanceState.getSerializable(DataBaseHelper.KEY_ROUTEID);
+				(Long) savedInstanceState.getSerializable(DataBaseHelper.KEY_ROUTEID);
 		mOriginId = (savedInstanceState == null) ? null :
-        	(Long) savedInstanceState.getSerializable(DataBaseHelper.KEY_ORIGINID);
-        if (mRouteId == null || mOriginId == null) {
-        	Bundle extras = getIntent().getExtras();
-        	mRouteId = extras != null ? extras.getLong(DataBaseHelper.KEY_ROUTEID)
-        			: null;
-        	mOriginId = extras != null ? extras.getLong(DataBaseHelper.KEY_ORIGINID)
-        			: null;
+				(Long) savedInstanceState.getSerializable(DataBaseHelper.KEY_ORIGINID);
+		if (mRouteId == null || mOriginId == null) {
+			Bundle extras = getIntent().getExtras();
+			mRouteId = extras != null ? extras.getLong(DataBaseHelper.KEY_ROUTEID)
+					: null;
+			mOriginId = extras != null ? extras.getLong(DataBaseHelper.KEY_ORIGINID)
+					: null;
 
         }
 
@@ -111,20 +107,19 @@ public class TimeList extends Activity implements View.OnClickListener {
 		startManagingCursor(routeName);
 
 
-		if(!originName.getString(originName.getColumnIndexOrThrow(DataBaseHelper.KEY_NAME)).contentEquals("to Plaza")) {
+		if (!originName.getString(originName.getColumnIndexOrThrow(DataBaseHelper.KEY_NAME)).contentEquals("to Plaza")) {
 
 			mTitleText.setText(
 					routeName.getString(routeName.getColumnIndexOrThrow(DataBaseHelper.KEY_NAME)) +
-					" from " +
-					originName.getString(originName.getColumnIndexOrThrow(DataBaseHelper.KEY_NAME)));
-		}
-		else {
+							" from " +
+							originName.getString(originName.getColumnIndexOrThrow(DataBaseHelper.KEY_NAME)));
+		} else {
 			mTitleText.setText(
 					routeName.getString(routeName.getColumnIndexOrThrow(DataBaseHelper.KEY_NAME)) + " " +
-					originName.getString(originName.getColumnIndexOrThrow(DataBaseHelper.KEY_NAME)));
+							originName.getString(originName.getColumnIndexOrThrow(DataBaseHelper.KEY_NAME)));
 		}
 		populateTimes();
-		if(mCursor.getCount() > 0)
+		if (mCursor.getCount() > 0)
 			setAdapter();
 	}
 
@@ -133,21 +128,20 @@ public class TimeList extends Activity implements View.OnClickListener {
 
 		if (mRouteId != null) {
 			mCursor = createList(mCursor, false);
-			if(mCursor.getCount() < 3 || currentTime.get(Calendar.HOUR_OF_DAY) >= 20) {
+			if (mCursor.getCount() < 3 || currentTime.get(Calendar.HOUR_OF_DAY) >= 20) {
 				mCursor = createList(mCursor, true);
 				tmrButton.setVisibility(View.GONE);
 				nextDay = true;
-			}
-			else nextDay = false;
+			} else nextDay = false;
 			// Add text if no times on current route
-			if(mCursor.getCount() < 1) {
+			if (mCursor.getCount() < 1) {
 				zeroTimes.setVisibility(View.VISIBLE);
 			}
 		}
 	}
 
 	private MatrixCursor createList(MatrixCursor timesMatrix, Boolean nextDay) {
-	    Cursor timesCursor;
+		Cursor timesCursor;
 		int rowKey = 0; //
 		String dayOfWeek = parseDay(nextDay); // grabs the day of the week code, use next day to check tomorrows times
 		Calendar departTime = Calendar.getInstance();
@@ -161,12 +155,11 @@ public class TimeList extends Activity implements View.OnClickListener {
 		int columnIndex = timesCursor.getColumnIndex(DataBaseHelper.KEY_TIME);
 
 		int i = 0;
-		while(!timesCursor.isAfterLast()) {
+		while (!timesCursor.isAfterLast()) {
 			times[i] = timesCursor.getString(columnIndex);
 
 			// Format Time String from Database to a Calendar Object (to Compare to Current Time)
-			try
-			{
+			try {
 				DateFormat timeParse = new SimpleDateFormat("HH:mm");
 				Date departDateTime = timeParse.parse(times[i]);
 				departTime.setTime(departDateTime);
@@ -176,22 +169,20 @@ public class TimeList extends Activity implements View.OnClickListener {
 				departTime.set(
 						currentTime.get(Calendar.YEAR),
 						currentTime.get(Calendar.MONTH),
-						( !nextDay ? currentTime.get(Calendar.DATE) : currentTime.get(Calendar.DATE) + 1 ) );
-			}
-			catch (Exception e)
-			{
+						(!nextDay ? currentTime.get(Calendar.DATE) : currentTime.get(Calendar.DATE) + 1));
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 			// Calculate the difference in time from now
 			Long difference = departTime.getTimeInMillis() - currentTime.getTimeInMillis();
-			difference = (difference/1000)/60; // From milliseconds to minutes.
+			difference = (difference / 1000) / 60; // From milliseconds to minutes.
 
-			if(i == 0 && !nextDay) // If this is the first value + not checking next days departures, get the difference for setting a pretty text color
+			if (i == 0 && !nextDay) // If this is the first value + not checking next days departures, get the difference for setting a pretty text color
 				nextDeparture = difference.longValue();
 
 			// Format that correctly
-			if(difference<60) {
+			if (difference < 60) {
 				departsIn[i] = difference + " mins";
 			} else {
 				// if the minutes are below ten, we want a leading 0
@@ -199,7 +190,7 @@ public class TimeList extends Activity implements View.OnClickListener {
 				departsIn[i] = (difference / 60) + " hr " + mins + " mins";
 			}
 
-			timesMatrix.addRow(new Object[] { rowKey++, times[i], departsIn[i] });
+			timesMatrix.addRow(new Object[]{rowKey++, times[i], departsIn[i]});
 			timesCursor.moveToNext();
 			i++;
 		}
@@ -214,23 +205,23 @@ public class TimeList extends Activity implements View.OnClickListener {
 			public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
 				boolean viewHandled = false;
 				TextView row = (TextView) view;
-				if(cursor.getPosition() == 0 && nextDeparture <= 30) {
+				if (cursor.getPosition() == 0 && nextDeparture <= 30) {
 					row.setTextColor(Color.YELLOW);
 					row.setText(cursor.getString(columnIndex));
 					viewHandled = true;
-				}
-				else {
+				} else {
 					row.setTextColor(Color.WHITE);
 				}
 				return viewHandled;
 			}
 		}
 
+		//FIXME: update call
 		timeTableList =
-			new SimpleCursorAdapter(this, R.layout.timetablelist2items, mCursor, columns, layouts);
+				new SimpleCursorAdapter(this, R.layout.timetablelist2items, mCursor, columns, layouts);
 		timeTableList.setViewBinder(new TimeViewBinder());
 		listView.setAdapter(timeTableList);
-		if(nextDay)
+		if (nextDay)
 			listView.removeFooterView(tmrButton);
 	}
 
@@ -248,45 +239,42 @@ public class TimeList extends Activity implements View.OnClickListener {
 
 		holidayCheck = parseDate(nextDay);
 
-		if(!mDb.checkHoliday(holidayCheck)) { // Check if Public Holiday
+		if (!mDb.checkHoliday(holidayCheck)) { // Check if Public Holiday
 			switch (currentDay) {
 
-			case 1:
-				ferryDay = DataBaseHelper.KEY_DAYID + "=3";
-				break;
-			case 2:
-				// this is to handle that ONE time on Sunday night (but to Timetable... its Monday morning...)
-				ferryDay = "(" + DataBaseHelper.KEY_DAYID + "=1 OR " + DataBaseHelper.KEY_DAYID + "=4)";
-				break;
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-				ferryDay = DataBaseHelper.KEY_DAYID + "=1";
-				break;
-			case 7:
-				// this is to handle that ONE time on Friday night (but to Timetable... its Saturday morning...)
-				ferryDay = "(" + DataBaseHelper.KEY_DAYID + "=2 OR " + DataBaseHelper.KEY_DAYID + "=4)";
-				break;
-			default:
-				Log.e(TAG, "Apparently no day of the week.");
-				break;
+				case 1:
+					ferryDay = DataBaseHelper.KEY_DAYID + "=3";
+					break;
+				case 2:
+					// this is to handle that ONE time on Sunday night (but to Timetable... its Monday morning...)
+					ferryDay = "(" + DataBaseHelper.KEY_DAYID + "=1 OR " + DataBaseHelper.KEY_DAYID + "=4)";
+					break;
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+					ferryDay = DataBaseHelper.KEY_DAYID + "=1";
+					break;
+				case 7:
+					// this is to handle that ONE time on Friday night (but to Timetable... its Saturday morning...)
+					ferryDay = "(" + DataBaseHelper.KEY_DAYID + "=2 OR " + DataBaseHelper.KEY_DAYID + "=4)";
+					break;
+				default:
+					Log.e(TAG, "Apparently no day of the week.");
+					break;
 			}
 
 
-			if(nextDay) {
-				if(currentDay == 1) {
+			if (nextDay) {
+				if (currentDay == 1) {
 					ferryDay = "(" + DataBaseHelper.KEY_DAYID + "=1 OR " + DataBaseHelper.KEY_DAYID + "=4)";
-				}
-				else if(currentDay == 7) {
+				} else if (currentDay == 7) {
 					ferryDay = DataBaseHelper.KEY_DAYID + "=3";
-				}
-				else if(currentDay == 6) {
+				} else if (currentDay == 6) {
 					ferryDay = "(" + DataBaseHelper.KEY_DAYID + "=2 OR " + DataBaseHelper.KEY_DAYID + "=4)";
 				}
 			}
-		}
-		else ferryDay = DataBaseHelper.KEY_DAYID + "=3"; // Public Holiday
+		} else ferryDay = DataBaseHelper.KEY_DAYID + "=3"; // Public Holiday
 
 		return ferryDay;
 	}
@@ -295,27 +283,26 @@ public class TimeList extends Activity implements View.OnClickListener {
 	private String parseDate(Boolean nextDay) {
 		int dayOfMonth, month;
 		String monthFormatted, dayOfMonthFormatted;
-		if(!nextDay) {
+		if (!nextDay) {
 			dayOfMonth = currentTime.get(Calendar.DAY_OF_MONTH);
 			month = currentTime.get(Calendar.MONTH) + 1;
-		}
-		else {
+		} else {
 			Calendar tomorrowDate = Calendar.getInstance();
-			tomorrowDate.set(Calendar.DAY_OF_MONTH, (tomorrowDate.get(Calendar.DAY_OF_MONTH)+1));
+			tomorrowDate.set(Calendar.DAY_OF_MONTH, (tomorrowDate.get(Calendar.DAY_OF_MONTH) + 1));
 			dayOfMonth = tomorrowDate.get(Calendar.DAY_OF_MONTH);
 			month = tomorrowDate.get(Calendar.MONTH) + 1;
 		}
 
-		if(dayOfMonth<10)
+		if (dayOfMonth < 10)
 			dayOfMonthFormatted = "0" + Integer.toString(dayOfMonth);
 		else dayOfMonthFormatted = Integer.toString(dayOfMonth);
 
-		if(month<10)
+		if (month < 10)
 			monthFormatted = "0" + Integer.toString(month);
 		else monthFormatted = Integer.toString(month);
 
 		String date = currentTime.get(Calendar.YEAR) + "-" +
-			monthFormatted + "-" + dayOfMonthFormatted;
+				monthFormatted + "-" + dayOfMonthFormatted;
 
 		return date;
 	}
@@ -326,14 +313,13 @@ public class TimeList extends Activity implements View.OnClickListener {
 		String timeSelectionHourFormated;
 		int timeSelectionHour = currentTime.get(Calendar.HOUR_OF_DAY);
 		int timeSelectionMinute = currentTime.get(Calendar.MINUTE);
-		if(timeSelectionMinute<10) { // Add 0 to beginning of minutes if under 10
+		if (timeSelectionMinute < 10) { // Add 0 to beginning of minutes if under 10
 			timeSelectionMinuteFormated = "0" + timeSelectionMinute;
-		}
-		else timeSelectionMinuteFormated = Integer.toString(timeSelectionMinute);
+		} else timeSelectionMinuteFormated = Integer.toString(timeSelectionMinute);
 
-		if(timeSelectionHour == 0) // Add 0 to beginning of hour if midnight
+		if (timeSelectionHour == 0) // Add 0 to beginning of hour if midnight
 			timeSelectionHourFormated = "00";
-		else if(timeSelectionHour < 10)
+		else if (timeSelectionHour < 10)
 			timeSelectionHourFormated = "0" + timeSelectionHour;
 		else timeSelectionHourFormated = Integer.toString(timeSelectionHour);
 		String timeSelection = timeSelectionHourFormated + ":" + timeSelectionMinuteFormated;
@@ -343,7 +329,7 @@ public class TimeList extends Activity implements View.OnClickListener {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if(mDb.isOpen())
+		if (mDb.isOpen())
 			mDb.close();
 	}
 
@@ -359,8 +345,8 @@ public class TimeList extends Activity implements View.OnClickListener {
 		super.onStart();
 		Log.d(TAG, "on Start Called");
 		currentTime = Calendar.getInstance();
-		if(!mDb.isOpen()) {
-			if(listView.getFooterViewsCount() < 1) {
+		if (!mDb.isOpen()) {
+			if (listView.getFooterViewsCount() < 1) {
 				tmrButton.setVisibility(View.VISIBLE);
 				listView.addFooterView(tmrButton);
 			}
@@ -380,8 +366,8 @@ public class TimeList extends Activity implements View.OnClickListener {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == KeyEvent.KEYCODE_BACK) {
-			if(mDb.isOpen())
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			if (mDb.isOpen())
 				mDb.close();
 		}
 		return super.onKeyDown(keyCode, event);
@@ -390,39 +376,39 @@ public class TimeList extends Activity implements View.OnClickListener {
 	//@Override
 	public void onClick(View v) {
 		Thread t = new Thread() {
-            public void run() {
-            	mCursor = createList(mCursor, true);
-                mHandler.post(mUpdateResults);
-            }
-        };
+			public void run() {
+				mCursor = createList(mCursor, true);
+				mHandler.post(mUpdateResults);
+			}
+		};
         t.start();
         tmrButton.setVisibility(View.GONE);
 	}
 
 	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.list_menu, menu);
-	    return true;
-    }
+		inflater.inflate(R.menu.list_menu, menu);
+		return true;
+	}
 
 	@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.main_menu:
-        	if(mDb.isOpen())
-        		mDb.close();
-        	setResult(RESULT_FIRST_USER);
-        	finish();
-            return true;
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.main_menu:
+				if (mDb.isOpen())
+					mDb.close();
+				setResult(RESULT_FIRST_USER);
+				finish();
+				return true;
 
-        case R.id.about_menu:
-        	if(mDb.isOpen())
-        		mDb.close();
-        	Intent i = new Intent(this, AboutPage.class);
-        	startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
-        	return true;
-        }
+			case R.id.about_menu:
+				if (mDb.isOpen())
+					mDb.close();
+				Intent i = new Intent(this, AboutPage.class);
+				startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
+				return true;
+		}
 
         return super.onOptionsItemSelected(item);
     }
@@ -430,12 +416,12 @@ public class TimeList extends Activity implements View.OnClickListener {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		switch(resultCode) {
-		case RESULT_FIRST_USER:
-			if(mDb.isOpen())
-				mDb.close();
-			setResult(RESULT_FIRST_USER);
-			finish();
+		switch (resultCode) {
+			case RESULT_FIRST_USER:
+				if (mDb.isOpen())
+					mDb.close();
+				setResult(RESULT_FIRST_USER);
+				finish();
 		}
 	}
 

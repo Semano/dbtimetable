@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/menu_fav_row"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    >
+
+    <TextView
+        android:id="@+id/favoriteLineName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:onClick="onSelectFavorite"
+        android:paddingEnd="20sp"
+        android:paddingLeft="20sp"
+        android:paddingRight="20sp"
+        android:paddingStart="20sp"
+        android:text="Favorite Line"
+        android:textSize="35sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/favoriteLineWarning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/favoriteLineName"
+        android:clickable="true"
+        android:gravity="end"
+        android:onClick="onSelectFavorite"
+        android:paddingEnd="20sp"
+        android:paddingLeft="20sp"
+        android:paddingRight="20sp"
+        android:paddingStart="20sp"
+        android:text="warning"
+        android:textColor="#dd5500"
+        android:textSize="20sp"/>
+
+
+    <TextView
+        android:id="@+id/favoriteLineTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/favoriteLineName"
+        android:clickable="true"
+        android:gravity="end"
+        android:onClick="onSelectFavorite"
+        android:paddingEnd="20sp"
+        android:paddingLeft="20sp"
+        android:paddingRight="20sp"
+        android:paddingStart="20sp"
+        android:text="Time Diff"
+        android:textSize="35sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/favoriteLineDepTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/favoriteLineTime"
+        android:layout_toRightOf="@id/favoriteLineName"
+        android:clickable="true"
+        android:gravity="end"
+        android:onClick="onSelectFavorite"
+        android:paddingEnd="20sp"
+        android:paddingLeft="20sp"
+        android:paddingRight="20sp"
+        android:paddingStart="20sp"
+        android:text="depart time"
+        android:textColor="#aaaaaa"
+        android:textSize="20sp"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/favoriteLineTime"
+        android:clickable="true"
+        android:onClick="onSelectFavoriteUnsubscripe"/>
+</RelativeLayout>

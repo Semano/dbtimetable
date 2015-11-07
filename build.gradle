@@ -25,7 +25,7 @@ android {
 
 //The API your project is targeting.//
 
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.2"
 
 ////The version of the build tools you want to use.//
 
@@ -77,4 +77,5 @@ dependencies {
     //Although you can add JAR files by compiling them individually, this can be time-consuming if you have lots of JARs. In this example, we�re telling Gradle to add all the JAR files in the app/libs folder.//
     //compile 'com.android.support:appcompat-v7:21.0.3'
     //To create more dependencies, add them to the depencies closure.//
+    compile files('libs/ical4j.jar')
 }

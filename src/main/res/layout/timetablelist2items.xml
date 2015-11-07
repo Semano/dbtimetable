@@ -17,29 +17,30 @@
  */
 -->
 
-<TwoLineListItem 
-	xmlns:android="http://schemas.android.com/apk/res/android" 
-	android:paddingTop="2dip"
-	android:paddingBottom="2dip"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:mode="oneLine">
-    
-	<TextView android:id="@+id/timesLeft"
-		android:gravity="left"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-        android:layout_marginLeft="6dip"
-        android:layout_gravity="center_vertical"
-		android:textAppearance="?android:attr/textAppearanceLarge"/>
-		
-	<TextView android:id="@+id/timesRight"
-		android:gravity="right"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center_vertical"
-        android:layout_alignLeft="@id/timesLeft"
-        android:layout_marginRight="6dip"
-		android:textAppearance="?android:attr/textAppearanceLarge"/>
+    android:paddingBottom="2dip"
+    android:paddingTop="2dip">
 
-</TwoLineListItem>
+    <TextView
+        android:id="@+id/timesLeft"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="6dip"
+        android:gravity="left"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <TextView
+        android:id="@+id/timesRight"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/timesLeft"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="6dip"
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+</RelativeLayout>

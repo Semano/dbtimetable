@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ical4j">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/ical4j.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

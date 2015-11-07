@@ -25,22 +25,25 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
 
-public class DBTimetable extends Activity implements View.OnClickListener {
+public class MainMenu extends Activity implements View.OnClickListener {
 
-    private DataBaseHelper mDb;
-
+    public static final int ACTIVITY_NEXT = 1;
     private static final String TAG = "MAIN MENU";
+    private DataBaseHelper mDb;
     private Button ferry, bus;
     private TextView ferryText, busText;
-    public static final int ACTIVITY_NEXT = 1;
+    private ListView favList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mainmenu);
         mDb = new DataBaseHelper(this);
@@ -49,31 +52,46 @@ public class DBTimetable extends Activity implements View.OnClickListener {
         ferryText = (TextView) findViewById(R.id.TextView01);
         bus = (Button) findViewById(R.id.Bus);
         busText = (TextView) findViewById(R.id.TextView02);
+        favList = (ListView) findViewById(R.id.menu_fav);
 
         // Click Listeners
         ferry.setOnClickListener(this);
         ferryText.setOnClickListener(this);
         bus.setOnClickListener(this);
         busText.setOnClickListener(this);
+        favList.setOnClickListener(this);
 
         try {
             mDb.createDataBase();
         } catch (IOException ioe) {
             Log.e(TAG, "Unable to create database:" + ioe);
         }
-        mDb.close();
+
+        // create favorite list
+        Adapter adapter = new FavListAdapter(this, mDb);
+
+
+        //mDb.close();
     }
 
     public void onClick(View v) {
         if (v == ferry || v == ferryText) {
             Intent i = new Intent(this, RouteList.class);
             i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.FERRYROUTE);
-            startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
+            startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
         } else if (v == bus || v == busText) {
             Intent i = new Intent(this, RouteList.class);
             i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.BUSROUTE);
-            startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
+            startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
         }
+    }
+
+    public void onSelectFavorite(View v) throws Exception {
+        throw new Exception("Not yet Implemented");
+    }
+
+    public void onSelectFavoriteUnsubscripe(View v) throws Exception {
+        throw new Exception("Not yet Implemented");
     }
 
     @Override
@@ -88,7 +106,7 @@ public class DBTimetable extends Activity implements View.OnClickListener {
         switch (item.getItemId()) {
             case R.id.about_menu:
                 Intent i = new Intent(this, AboutPage.class);
-                startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
+                startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
                 return true;
         }
         return super.onOptionsItemSelected(item);
