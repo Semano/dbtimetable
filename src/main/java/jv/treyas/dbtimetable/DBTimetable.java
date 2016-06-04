@@ -19,6 +19,7 @@ package jv.treyas.dbtimetable;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -32,7 +33,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 
-public class MainMenu extends Activity implements View.OnClickListener {
+public class DBTimetable extends Activity {
 
     public static final int ACTIVITY_NEXT = 1;
     private static final String TAG = "MAIN MENU";
@@ -41,12 +42,31 @@ public class MainMenu extends Activity implements View.OnClickListener {
     private TextView ferryText, busText;
     private ListView favList;
 
+    private View.OnClickListener mOnClick;
+
+    DBTimetable() {
+        mOnClick = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (view == ferry || view == ferryText) {
+                    Intent i = new Intent(getApplicationContext(), RouteList.class);
+                    i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.FERRYROUTE);
+                    startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
+                } else if (view == bus || view == busText) {
+                    Intent i = new Intent(getApplicationContext(), RouteList.class);
+                    i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.BUSROUTE);
+                    startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
+                }
+            }
+        };
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
 
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.mainmenu);
-        mDb = new DataBaseHelper(this);
+        mDb = DataBaseHelper.getInstanace(this);
 
         ferry = (Button) findViewById(R.id.Ferry);
         ferryText = (TextView) findViewById(R.id.TextView01);
@@ -55,11 +75,21 @@ public class MainMenu extends Activity implements View.OnClickListener {
         favList = (ListView) findViewById(R.id.menu_fav);
 
         // Click Listeners
-        ferry.setOnClickListener(this);
-        ferryText.setOnClickListener(this);
-        bus.setOnClickListener(this);
-        busText.setOnClickListener(this);
-        favList.setOnClickListener(this);
+        try {
+            Log.d(TAG, "onCreate() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
+            ferry.setOnClickListener(mOnClick);
+            Log.d(TAG, "set ferry");
+            ferryText.setOnClickListener(mOnClick);
+            Log.d(TAG, "set ferry text");
+            bus.setOnClickListener(mOnClick);
+            Log.d(TAG, "set bus");
+            busText.setOnClickListener(mOnClick);
+            Log.d(TAG, "set bus text");
+            favList.setOnClickListener(mOnClick);
+            Log.d(TAG, "set fav list");
+        } catch (Exception ex) {
+            Log.d(TAG, ex.getMessage());
+        }
 
         try {
             mDb.createDataBase();
@@ -69,29 +99,21 @@ public class MainMenu extends Activity implements View.OnClickListener {
 
         // create favorite list
         Adapter adapter = new FavListAdapter(this, mDb);
+        super.onCreate(savedInstanceState);
 
-
-        //mDb.close();
-    }
-
-    public void onClick(View v) {
-        if (v == ferry || v == ferryText) {
-            Intent i = new Intent(this, RouteList.class);
-            i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.FERRYROUTE);
-            startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
-        } else if (v == bus || v == busText) {
-            Intent i = new Intent(this, RouteList.class);
-            i.putExtra(DataBaseHelper.KEY_ROUTETYPE, DataBaseHelper.BUSROUTE);
-            startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
-        }
     }
 
     public void onSelectFavorite(View v) throws Exception {
         throw new Exception("Not yet Implemented");
+        // go to line plan activity (Time List)
+
     }
 
-    public void onSelectFavoriteUnsubscripe(View v) throws Exception {
-        throw new Exception("Not yet Implemented");
+    public void onSelectFavoriteUnsubscripe(ListView parent, View v, int position, long id) throws Exception {
+        SharedPreferences preferences = getSharedPreferences(getApplicationInfo().className, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(FavListAdapter.FAVORTIE_SETTING_NAME + position, 0);
+        editor.apply();
     }
 
     @Override
@@ -106,7 +128,7 @@ public class MainMenu extends Activity implements View.OnClickListener {
         switch (item.getItemId()) {
             case R.id.about_menu:
                 Intent i = new Intent(this, AboutPage.class);
-                startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
+                startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -20,17 +20,20 @@ import java.util.Locale;
  */
 public class FavListAdapter extends BaseAdapter {
 
+    public static final int MAXITEMS = 10;
+    public static final String FAVORTIE_SETTING_NAME = "fav";
+
     private static Context context;
     private static LayoutInflater inflater = null;
     private static DataBaseHelper mDB;
-    private static DateFormat timeFormat;
+    private static DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CHINESE);
     private static int count = 0;
+
 
     public FavListAdapter(Context context, DataBaseHelper db) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.context = context;
+        FavListAdapter.context = context;
         mDB = db;
-        timeFormat = new SimpleDateFormat("HH:mm", Locale.CHINESE);
     }
 
     @Override
@@ -56,7 +59,7 @@ public class FavListAdapter extends BaseAdapter {
 
         SharedPreferences preferences = context.getSharedPreferences(context.getApplicationInfo().className, Context.MODE_PRIVATE);
 
-        int favorite = preferences.getInt("fav" + i, 0);
+        int favorite = preferences.getInt(FAVORTIE_SETTING_NAME + i, 0);
         if (favorite != 0) {
             TextView name = (TextView) view.findViewById(R.id.favoriteLineName);
             TextView timeLeft = (TextView) view.findViewById(R.id.favoriteLineTime);

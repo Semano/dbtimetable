@@ -9,49 +9,61 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="100dp"
-        android:gravity="center_horizontal">
+        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/Ferry"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:background="@drawable/ferry"/>
-
-
-        <TextView
-            android:id="@+id/TextView01"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/Ferry"
-            android:layout_marginRight="50dp"
-            android:layout_toRightOf="@+id/Ferry"
-            android:text="Ferries"
-            android:textColor="@android:color/white"
-            android:textSize="24dp"
-            android:textStyle="bold"/>
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/Ferry"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/ferry"/>
 
 
-        <Button
-            android:id="@+id/Bus"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_below="@+id/Ferry"
-            android:background="@drawable/bus"/>
+            <TextView
+                android:id="@+id/TextView01"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/Ferry"
+                android:layout_marginRight="50dp"
+                android:layout_toRightOf="@id/Ferry"
+                android:text="Ferries"
+                android:textColor="@android:color/white"
+                android:textSize="24dp"
+                android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/TextView02"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/Bus"
-            android:layout_below="@+id/Ferry"
-            android:layout_toRightOf="@+id/Bus"
-            android:text="Buses"
-            android:textColor="@android:color/white"
-            android:textSize="24dp"
-            android:textStyle="bold"/>
 
+            <Button
+                android:id="@+id/Bus"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_below="@id/Ferry"
+                android:background="@drawable/bus"/>
+
+            <TextView
+                android:id="@+id/TextView02"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/Bus"
+                android:layout_below="@id/Ferry"
+                android:layout_toRightOf="@id/Bus"
+                android:text="Buses"
+                android:textColor="@android:color/white"
+                android:textSize="24dp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
     </LinearLayout>
 
+    <ListView
+        android:id="@+id/menu_fav"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    </ListView>
 </LinearLayout>

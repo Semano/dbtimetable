@@ -21,7 +21,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,16 +37,17 @@ public class RouteList extends ListActivity {
     private SimpleCursorAdapter routes;
     private Cursor routesCursor;
 
-    //private static final String TAG = "ROUTELIST";
+    private static final String TAG = "ROUTELIST";
     private int routeType = -1;
     private TextView mTitleBar;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.timetablemain);
-        mDb = new DataBaseHelper(this);
+        mDb = DataBaseHelper.getInstanace(this);
         mDb.openDataBase();
 
         routeType = (savedInstanceState == null) ? -1 :
@@ -96,12 +97,12 @@ public class RouteList extends ListActivity {
         super.onListItemClick(l, v, position, id);
         Intent i = new Intent(this, OriginList.class);
         i.putExtra(DataBaseHelper.KEY_ROUTEID, id);
-        //mDb.close();
-        startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
+        startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
     }
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "onPause() called");
         super.onPause();
 
         if (this.routes != null) {
@@ -113,27 +114,22 @@ public class RouteList extends ListActivity {
             this.routesCursor.close();
             this.routesCursor = null;
         }
-
-        if (this.mDb != null) {
-            this.mDb.close();
-        }
     }
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume() called");
         super.onResume();
         if (!mDb.isOpen()) {
             mDb.openDataBase();
-            fillRows();
         }
+        fillRows();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(DataBaseHelper.KEY_ROUTETYPE, routeType);
-        if (mDb.isOpen())
-            mDb.close();
     }
 
     @Override
@@ -147,17 +143,13 @@ public class RouteList extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.main_menu:
-                if (mDb.isOpen())
-                    mDb.close();
                 setResult(RESULT_FIRST_USER);
                 finish();
                 return true;
 
             case R.id.about_menu:
-                if (mDb.isOpen())
-                    mDb.close();
                 Intent i = new Intent(this, AboutPage.class);
-                startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
+                startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
                 return true;
         }
 
@@ -170,20 +162,9 @@ public class RouteList extends ListActivity {
 
         switch (resultCode) {
             case RESULT_FIRST_USER:
-                mDb.close();
                 setResult(RESULT_FIRST_USER);
                 finish();
         }
     }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            mDb.close();
-        }
-
-        return super.onKeyDown(keyCode, event);
-    }
-
 
 }

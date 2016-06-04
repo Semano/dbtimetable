@@ -65,15 +65,22 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 20;
     private static String DB_PATH = "/data/data/jv.treyas.dbtimetable/databases/";
     private static String DB_NAME = "timetable.sqlite";
+    private static DataBaseHelper myInstance;
     private final Context myContext;
     DateFormat timeFormat = new SimpleDateFormat("HH:mm");
-    DateFormat dateFormat = new SimpleDateFormat("YYYY-DD-MM");
-    private SQLiteDatabase myDataBase;
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-DD-MM");
+    private static SQLiteDatabase myDataBase;
 
-
-    public DataBaseHelper(Context context) {
+    private DataBaseHelper(Context context) {
         super(context, DB_NAME, null, DATABASE_VERSION);
         this.myContext = context;
+    }
+
+    public static DataBaseHelper getInstanace(Context ctx) {
+        if (myInstance == null) {
+            myInstance = new DataBaseHelper(ctx.getApplicationContext());
+        }
+        return myInstance;
     }
 
     /**
@@ -108,12 +115,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String myPath = DB_PATH + DB_NAME;
             checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
         } catch (SQLiteException e) {
-            Log.d(TAG, "Database doesn't exist yet...");
+            Log.d(TAG, "checkDatabase: Database doesn't exist yet...");
         }
 
         if (checkDB != null) {
             checkDB.close();
-            Log.d(TAG, "DB Exists");
+            Log.d(TAG, "checkDatabase: DB exists");
         }
 
         return checkDB != null ? true : false;
@@ -155,7 +162,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      */
     public void openDataBase() throws SQLException {
         String myPath = DB_PATH + DB_NAME;
-        myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+        if (myDataBase == null) {
+            myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+            if (myDataBase.isOpen())
+                Log.d(TAG, "openDataBase: database opened " + myDataBase);
+            else
+                Log.d(TAG, "openDataBase: unable to open database");
+        } else
+            Log.d(TAG, "openDataBase: database is open already. myDatabase is " + myDataBase);
     }
 
     /**
@@ -171,6 +185,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public synchronized void close() {
+        Log.d(TAG, "close() called");
         if (myDataBase != null)
             myDataBase.close();
 
@@ -229,8 +244,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor fetchOriginsID(Long route) throws SQLException {
-        Cursor originId =
-                myDataBase.query(true, TIMES_TABLE, new String[]{KEY_ORIGINID}, KEY_ROUTEID + "=" + route, null, null, null, null, null);
+        if (!myDataBase.isOpen()) {
+            Log.d(TAG, "fetchOriginsID: database is not open route is " + route);
+            return null;
+        }
+        Cursor originId = myDataBase.query(true, TIMES_TABLE, new String[]{KEY_ORIGINID}, KEY_ROUTEID + "=" + route, null, null, null, null, null);
         if (originId != null) {
             originId.moveToFirst();
         }
@@ -239,8 +257,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     // Fetch single OriginName for use in Title bar
     public Cursor fetchOriginName(Long originId) throws SQLException {
-        Cursor originName =
-                myDataBase.query(true, ORIGINS_TABLE, new String[]{KEY_ROWID, KEY_NAME}, KEY_ROWID + "=" + originId, null, null, null, null, null);
+        Cursor originName = myDataBase.query(true, ORIGINS_TABLE, new String[]{KEY_ROWID, KEY_NAME}, KEY_ROWID + "=" + originId, null, null, null, null, null);
         originName.moveToFirst();
         return originName;
     }
@@ -250,13 +267,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         String originSelection = "";
 
         for (int i = 0; i < originId.length; i++) { // Format Selection for number of SelectionArgs.. Pain in the Ass!
-            if (originSelection.equals("")) {
+            if (!originSelection.equals("")) {
                 originSelection = originSelection + " OR ";
             }
             originSelection = originSelection + KEY_ROWID + "=" + '?';
         }
+        Cursor result = null;
+        try {
+            result = myDataBase.query(true, ORIGINS_TABLE, new String[]{KEY_ROWID, KEY_NAME}, originSelection, originId, null, null, null, null);
+        } catch (SQLException sqlEx) {
+            Log.d(TAG, "fetchOriginName: SQL Exception " + sqlEx.getMessage());
+        }
 
-        return myDataBase.query(true, ORIGINS_TABLE, new String[]{KEY_ROWID, KEY_NAME}, originSelection, originId, null, null, null, null);
+        return result;
     }
 
     public Boolean checkHoliday(String currentDay) {

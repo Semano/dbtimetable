@@ -21,7 +21,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,14 +36,15 @@ public class OriginList extends ListActivity {
     private TextView mTitleText;
     private DataBaseHelper mDb;
     private Long mRouteId;
-    //private static final String TAG = "ORIGINLIST";
+    private static final String TAG = "ORIGINLIST";
     private Cursor routeTitleCursor, originsCursor;
     private SimpleCursorAdapter origins;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
-        mDb = new DataBaseHelper(this);
+        mDb = DataBaseHelper.getInstanace(this);
         setContentView(R.layout.origin_layout);
 
         mTitleText = (TextView) findViewById(R.id.routeTitle);
@@ -119,7 +120,7 @@ public class OriginList extends ListActivity {
         i.putExtra(DataBaseHelper.KEY_ROUTEID, mRouteId);
         i.putExtra(DataBaseHelper.KEY_ORIGINID, id);
         //Log.d(TAG, "List items row id =" + Long.toString(id));
-        startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
+        startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
     }
 
     /* (non-Javadoc)
@@ -127,25 +128,16 @@ public class OriginList extends ListActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (resultCode) {
             case RESULT_FIRST_USER:
-                if (mDb.isOpen())
-                    mDb.close();
                 setResult(RESULT_FIRST_USER);
                 finish();
         }
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mDb.isOpen())
-                mDb.close();
-        }
-        return super.onKeyDown(keyCode, event);
-    }
 
 	/*@Override
     protected void onPause() {
@@ -154,16 +146,14 @@ public class OriginList extends ListActivity {
 			routeTitleCursor.close();
 		if(!originsCursor.isClosed())
 			originsCursor.close();
-		if(mDb.isOpen())
-		mDb.close();
 	}*/
 
 
     @Override
     protected void onStop() {
-        // TODO Auto-generated method stub
+        Log.d(TAG, "onStop() called");
         super.onStop();
-
+/*
         if (this.origins != null) {
             this.origins.getCursor().close();
             this.origins = null;
@@ -178,26 +168,25 @@ public class OriginList extends ListActivity {
             this.originsCursor.close();
             this.originsCursor = null;
         }
-
-        if (this.mDb != null) {
-            this.mDb.close();
-        }
+        */
     }
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume() called");
         super.onResume();
         if (!mDb.isOpen()) {
+            Log.d(TAG, "onResume: db is not open");
             mDb.openDataBase();
-            populateOrigins();
         }
+        Log.d(TAG, "onResume: db is open");
+        populateOrigins();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(DataBaseHelper.KEY_ROUTEID, mRouteId);
-        //mDb.close();
     }
 
     @Override
@@ -211,17 +200,13 @@ public class OriginList extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.main_menu:
-                if (mDb.isOpen())
-                    mDb.close();
                 setResult(RESULT_FIRST_USER);
                 finish();
                 return true;
 
             case R.id.about_menu:
-                if (mDb.isOpen())
-                    mDb.close();
                 Intent i = new Intent(this, AboutPage.class);
-                startActivityForResult(i, MainMenu.ACTIVITY_NEXT);
+                startActivityForResult(i, DBTimetable.ACTIVITY_NEXT);
                 return true;
         }
 
